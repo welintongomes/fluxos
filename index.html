@@ -4603,7 +4603,7 @@
             });
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
-    function scrollAllVisibleStepsToEnd(taskId) {
+function scrollAllVisibleStepsToEnd(taskId) {
     const taskElement = document
         .querySelector(`[data-taskid="${taskId}"]`)
         ?.closest('.task-item');
@@ -4611,11 +4611,12 @@
     if (!taskElement) return;
 
     const wrapper = taskElement.querySelector('.task-steps-wrapper');
+    const stepsContainer = taskElement.querySelector('.task-steps'); // 🔥 container vertical
     const steps = taskElement.querySelectorAll('.task-step');
 
-    if (!wrapper) return;
+    if (!wrapper || !stepsContainer) return;
 
-    // Mantém exatamente como estava (horizontal funcionando)
+    // ✅ Mantém seu horizontal original
     setTimeout(() => {
         wrapper.scrollLeft = wrapper.scrollWidth;
     }, 60);
@@ -4628,8 +4629,9 @@
 
         const stepRect = step.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect();
+        const containerRect = stepsContainer.getBoundingClientRect();
 
-        // 🔵 Mantém lógica horizontal original
+        // 🔵 Horizontal (igual antes)
         if (stepRect.right > wrapperRect.right) {
             step.scrollIntoView({
                 behavior: 'smooth',
@@ -4638,13 +4640,16 @@
             });
         }
 
-        // 🔥 NOVO: Corrigir apenas se estiver cortado verticalmente
-        if (stepRect.bottom > wrapperRect.bottom) {
-            wrapper.scrollTop += (stepRect.bottom - wrapperRect.bottom);
+        // 🔥 Vertical corrigido na div correta (.task-steps)
+
+        // Se estiver cortado embaixo
+        if (stepRect.bottom > containerRect.bottom) {
+            stepsContainer.scrollTop += (stepRect.bottom - containerRect.bottom);
         }
 
-        if (stepRect.top < wrapperRect.top) {
-            wrapper.scrollTop -= (wrapperRect.top - stepRect.top);
+        // Se estiver cortado em cima
+        if (stepRect.top < containerRect.top) {
+            stepsContainer.scrollTop -= (containerRect.top - stepRect.top);
         }
     });
 }
