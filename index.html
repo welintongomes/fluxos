@@ -679,10 +679,9 @@
         .task-steps {
             min-height: 153px;
             max-height: 344px;
-            overflow-x: auto;
             overflow-y: auto;
             padding: 8px 16px 12px;
-            /* scrollbar-width: thin; */
+            scrollbar-width: thin;
             scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
         }
 
@@ -1462,15 +1461,14 @@
                 flex-direction: row;
             }
 
-.task-steps {
-    min-height: 250px;
-    max-height: 344px;
-    overflow-y: auto;
-    overflow-x: auto;
-    padding: 8px 16px 12px;
-    /* scrollbar-width: thin; */
-    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-}
+            .task-steps {
+                min-height: 250px;
+                max-height: 344px;
+                overflow-y: auto;
+                padding: 8px 16px 12px;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+            }
 
             .create-btn-row {
                 justify-content: space-between;
@@ -4578,7 +4576,6 @@
                     icon.textContent = '▼';
                 }
             });
-            // ADICIONE ISSO:
             setTimeout(() => {
                 scrollAllVisibleStepsToEnd(taskId);
             }, 60);
@@ -4605,36 +4602,56 @@
             });
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
-        function scrollAllVisibleStepsToEnd(taskId) {
-            const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
-            if (!taskElement) return;
+function scrollAllVisibleStepsToEnd(taskId) {
+    const taskElement = document
+        .querySelector(`[data-taskid="${taskId}"]`)
+        ?.closest('.task-item');
 
-            const wrapper = taskElement.querySelector('.task-steps-wrapper');
-            const steps = taskElement.querySelectorAll('.task-step');
+    if (!taskElement) return;
 
-            if (!wrapper) return;
+    const wrapper = taskElement.querySelector('.task-steps-wrapper');
+    const stepsContainer = taskElement.querySelector('.task-steps'); // 🔥 container vertical
+    const steps = taskElement.querySelectorAll('.task-step');
 
-            // Scroll do wrapper principal para o final
-            setTimeout(() => {
-                wrapper.scrollLeft = wrapper.scrollWidth;
-            }, 60);
+    if (!wrapper || !stepsContainer) return;
 
-            // Para cada step visível, garantir que seu conteúdo também seja visível
-            steps.forEach(step => {
-                if (step.style.display === 'none') return;
+    // ✅ Mantém seu horizontal original
+    setTimeout(() => {
+        wrapper.scrollLeft = wrapper.scrollWidth;
+    }, 60);
 
-                const content = step.querySelector('.step-content');
-                if (!content) return;
+    steps.forEach(step => {
+        if (step.style.display === 'none') return;
 
-                // Scroll horizontal do step individual se necessário
-                const stepRect = step.getBoundingClientRect();
-                const wrapperRect = wrapper.getBoundingClientRect();
+        const content = step.querySelector('.step-content');
+        if (!content) return;
 
-                if (stepRect.right > wrapperRect.right) {
-                    step.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
-                }
+        const stepRect = step.getBoundingClientRect();
+        const wrapperRect = wrapper.getBoundingClientRect();
+        const containerRect = stepsContainer.getBoundingClientRect();
+
+        // 🔵 Horizontal (igual antes)
+        if (stepRect.right > wrapperRect.right) {
+            step.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'end'
             });
         }
+
+        // 🔥 Vertical corrigido na div correta (.task-steps)
+
+        // Se estiver cortado embaixo
+        if (stepRect.bottom > containerRect.bottom) {
+            stepsContainer.scrollTop += (stepRect.bottom - containerRect.bottom);
+        }
+
+        // Se estiver cortado em cima
+        if (stepRect.top < containerRect.top) {
+            stepsContainer.scrollTop -= (containerRect.top - stepRect.top);
+        }
+    });
+}
 
         // ==================== BOTÕES VISUAIS DE NÍVEL ====================
 
