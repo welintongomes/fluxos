@@ -4603,7 +4603,7 @@
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
 function scrollAllVisibleStepsToEnd(taskId) {
-    const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
+    const taskElement = document.querySelector(`[data-taskid="${taskId}"]`)?.closest('.task-item');
     if (!taskElement) return;
 
     const wrapper = taskElement.querySelector('.task-steps-wrapper');
@@ -4612,41 +4612,44 @@ function scrollAllVisibleStepsToEnd(taskId) {
 
     if (!wrapper) return;
 
-    // ===== VERTICAL SUAVE PRIMEIRO =====
-    if (stepsContainer) {
-        // requestAnimationFrame garante que rode no próximo ciclo de renderização
+    // 🔹 Espera 2 frames para garantir que o layout finalizou
+    requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            stepsContainer.scrollTo({
-                top: stepsContainer.scrollHeight,
-                behavior: 'smooth'
-            });
-        });
-    }
 
-    // ===== HORIZONTAL ORIGINAL DEPOIS =====
-    setTimeout(() => {
-        // scroll principal do wrapper
-        wrapper.scrollLeft = wrapper.scrollWidth;
-
-        // scroll individual de cada step se necessário
-        steps.forEach(step => {
-            if (step.style.display === 'none') return;
-
-            const content = step.querySelector('.step-content');
-            if (!content) return;
-
-            const stepRect = step.getBoundingClientRect();
-            const wrapperRect = wrapper.getBoundingClientRect();
-
-            if (stepRect.right > wrapperRect.right) {
-                step.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest',
-                    inline: 'end'
+            // 🔹 VERTICAL SUAVE
+            if (stepsContainer) {
+                stepsContainer.scrollTo({
+                    top: stepsContainer.scrollHeight,
+                    behavior: 'smooth'
                 });
             }
+
+            // 🔹 HORIZONTAL SUAVE (mantendo sua lógica original)
+            wrapper.scrollTo({
+                left: wrapper.scrollWidth,
+                behavior: 'smooth'
+            });
+
+            // 🔹 Scroll individual de cada step horizontal, se necessário
+            steps.forEach(step => {
+                if (step.style.display === 'none') return;
+
+                const content = step.querySelector('.step-content');
+                if (!content) return;
+
+                const stepRect = step.getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
+
+                if (stepRect.right > wrapperRect.right) {
+                    step.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                        inline: 'end'
+                    });
+                }
+            });
         });
-    }, 60);
+    });
 }
 
 
