@@ -4576,7 +4576,6 @@
                     icon.textContent = '▼';
                 }
             });
-            // ADICIONE ISSO:
             setTimeout(() => {
                 scrollAllVisibleStepsToEnd(taskId);
             }, 60);
@@ -4603,7 +4602,7 @@
             });
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
-function scrollAllVisibleStepsToEnd(taskId) {
+        function scrollAllVisibleStepsToEnd(taskId) {
     const taskElement = document
         .querySelector(`[data-taskid="${taskId}"]`)
         ?.closest('.task-item');
@@ -4616,11 +4615,17 @@ function scrollAllVisibleStepsToEnd(taskId) {
 
     if (!wrapper || !stepsContainer) return;
 
-    // ✅ Mantém seu horizontal original
     setTimeout(() => {
+
+        // 🔥 SCROLL HORIZONTAL (igual ao seu original)
         wrapper.scrollLeft = wrapper.scrollWidth;
+
+        // 🔥 SCROLL VERTICAL PARA O FINAL
+        stepsContainer.scrollTop = stepsContainer.scrollHeight;
+
     }, 60);
 
+    // Mantém sua lógica horizontal individual
     steps.forEach(step => {
         if (step.style.display === 'none') return;
 
@@ -4629,27 +4634,13 @@ function scrollAllVisibleStepsToEnd(taskId) {
 
         const stepRect = step.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect();
-        const containerRect = stepsContainer.getBoundingClientRect();
 
-        // 🔵 Horizontal (igual antes)
         if (stepRect.right > wrapperRect.right) {
             step.scrollIntoView({
                 behavior: 'smooth',
                 block: 'nearest',
                 inline: 'end'
             });
-        }
-
-        // 🔥 Vertical corrigido na div correta (.task-steps)
-
-        // Se estiver cortado embaixo
-        if (stepRect.bottom > containerRect.bottom) {
-            stepsContainer.scrollTop += (stepRect.bottom - containerRect.bottom);
-        }
-
-        // Se estiver cortado em cima
-        if (stepRect.top < containerRect.top) {
-            stepsContainer.scrollTop -= (containerRect.top - stepRect.top);
         }
     });
 }
