@@ -4615,11 +4615,17 @@ function scrollAllVisibleStepsToEnd(taskId) {
 
     if (!wrapper || !stepsContainer) return;
 
-    // ✅ Mantém seu horizontal original
     setTimeout(() => {
+
+        // 🔥 SCROLL HORIZONTAL (igual ao seu original)
         wrapper.scrollLeft = wrapper.scrollWidth;
+
+        // 🔥 SCROLL VERTICAL PARA O FINAL
+        stepsContainer.scrollTop = stepsContainer.scrollHeight;
+
     }, 60);
 
+    // Mantém sua lógica horizontal individual
     steps.forEach(step => {
         if (step.style.display === 'none') return;
 
@@ -4628,9 +4634,7 @@ function scrollAllVisibleStepsToEnd(taskId) {
 
         const stepRect = step.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect();
-        const containerRect = stepsContainer.getBoundingClientRect();
 
-        // 🔵 Horizontal (igual antes)
         if (stepRect.right > wrapperRect.right) {
             step.scrollIntoView({
                 behavior: 'smooth',
@@ -4638,21 +4642,10 @@ function scrollAllVisibleStepsToEnd(taskId) {
                 inline: 'end'
             });
         }
-
-        // 🔥 Vertical corrigido na div correta (.task-steps)
-
-        // Se estiver cortado embaixo
-        if (stepRect.bottom > containerRect.bottom) {
-            stepsContainer.scrollTop += (stepRect.bottom - containerRect.bottom);
-        }
-
-        // Se estiver cortado em cima
-        if (stepRect.top < containerRect.top) {
-            stepsContainer.scrollTop -= (containerRect.top - stepRect.top);
-        }
     });
 }
 
+        
         // ==================== BOTÕES VISUAIS DE NÍVEL ====================
 
         function _getLineRange(textarea) {
