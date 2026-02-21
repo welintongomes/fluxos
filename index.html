@@ -678,10 +678,11 @@
 
         .task-steps {
             min-height: 153px;
-            /* max-height: 344px; */
+            max-height: 344px;
+            overflow-x: auto;
             overflow-y: auto;
             padding: 8px 16px 12px;
-            scrollbar-width: thin;
+            /* scrollbar-width: thin; */
             scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
         }
 
@@ -1461,14 +1462,15 @@
                 flex-direction: row;
             }
 
-            .task-steps {
-                min-height: 250px;
-                /* max-height: 340px; */
-                overflow-y: auto;
-                padding: 8px 16px 12px;
-                scrollbar-width: thin;
-                scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-            }
+.task-steps {
+    min-height: 250px;
+    max-height: 344px;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 8px 16px 12px;
+    /* scrollbar-width: thin; */
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
 
             .create-btn-row {
                 justify-content: space-between;
@@ -4576,10 +4578,10 @@
                     icon.textContent = '▼';
                 }
             });
-                // ADICIONE ISSO:
-    setTimeout(() => {
-        scrollAllVisibleStepsToEnd(taskId);
-    }, 60);
+            // ADICIONE ISSO:
+            setTimeout(() => {
+                scrollAllVisibleStepsToEnd(taskId);
+            }, 60);
         }
 
         // Recolher todos os níveis (exceto nível 0)
