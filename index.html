@@ -4612,28 +4612,9 @@ function scrollAllVisibleStepsToEnd(taskId) {
 
     if (!wrapper) return;
 
-    // ===== HORIZONTAL ORIGINAL =====
-    setTimeout(() => {
-        wrapper.scrollLeft = wrapper.scrollWidth;
-    }, 60);
-
-    steps.forEach(step => {
-        if (step.style.display === 'none') return;
-
-        const content = step.querySelector('.step-content');
-        if (!content) return;
-
-        const stepRect = step.getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
-
-        if (stepRect.right > wrapperRect.right) {
-            step.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
-        }
-    });
-
-    // ===== VERTICAL SUAVE =====
-    // Executa no próximo ciclo de renderização para não conflitar com o horizontal
+    // ===== VERTICAL SUAVE PRIMEIRO =====
     if (stepsContainer) {
+        // requestAnimationFrame garante que rode no próximo ciclo de renderização
         requestAnimationFrame(() => {
             stepsContainer.scrollTo({
                 top: stepsContainer.scrollHeight,
@@ -4641,6 +4622,31 @@ function scrollAllVisibleStepsToEnd(taskId) {
             });
         });
     }
+
+    // ===== HORIZONTAL ORIGINAL DEPOIS =====
+    setTimeout(() => {
+        // scroll principal do wrapper
+        wrapper.scrollLeft = wrapper.scrollWidth;
+
+        // scroll individual de cada step se necessário
+        steps.forEach(step => {
+            if (step.style.display === 'none') return;
+
+            const content = step.querySelector('.step-content');
+            if (!content) return;
+
+            const stepRect = step.getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
+
+            if (stepRect.right > wrapperRect.right) {
+                step.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'end'
+                });
+            }
+        });
+    }, 60);
 }
 
 
