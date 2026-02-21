@@ -4610,39 +4610,26 @@ function scrollAllVisibleStepsToEnd(taskId) {
     if (!taskElement) return;
 
     const wrapper = taskElement.querySelector('.task-steps-wrapper');
-    const stepsContainer = taskElement.querySelector('.task-steps'); // 🔥 container vertical
-    const steps = taskElement.querySelectorAll('.task-step');
+    const stepsContainer = taskElement.querySelector('.task-steps');
 
     if (!wrapper || !stepsContainer) return;
 
+    // Pequeno delay para garantir que o DOM já expandiu
     setTimeout(() => {
 
-        // 🔥 SCROLL HORIZONTAL (igual ao seu original)
-        wrapper.scrollLeft = wrapper.scrollWidth;
+        // ✅ HORIZONTAL (correto para desktop e mobile)
+        wrapper.scrollTo({
+            left: wrapper.scrollWidth - wrapper.clientWidth,
+            behavior: 'smooth'
+        });
 
-        // 🔥 SCROLL VERTICAL PARA O FINAL
-        stepsContainer.scrollTop = stepsContainer.scrollHeight;
+        // ✅ VERTICAL (até o final real)
+        stepsContainer.scrollTo({
+            top: stepsContainer.scrollHeight - stepsContainer.clientHeight,
+            behavior: 'smooth'
+        });
 
-    }, 60);
-
-    // Mantém sua lógica horizontal individual
-    steps.forEach(step => {
-        if (step.style.display === 'none') return;
-
-        const content = step.querySelector('.step-content');
-        if (!content) return;
-
-        const stepRect = step.getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
-
-        if (stepRect.right > wrapperRect.right) {
-            step.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'end'
-            });
-        }
-    });
+    }, 80);
 }
 
         
