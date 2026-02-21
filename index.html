@@ -4603,41 +4603,36 @@
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
 function scrollAllVisibleStepsToEnd(taskId) {
-    const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
-    if (!taskElement) return;
+            const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
+            if (!taskElement) return;
 
-    const wrapper = taskElement.querySelector('.task-steps-wrapper');
-    const stepsContainer = taskElement.querySelector('.task-steps'); // 🔥 container vertical
-    const steps = taskElement.querySelectorAll('.task-step');
+            const wrapper = taskElement.querySelector('.task-steps-wrapper');
+            const steps = taskElement.querySelectorAll('.task-step');
 
-    if (!wrapper) return;
+            if (!wrapper) return;
 
-    // 🔵 MANTIDO EXATAMENTE COMO ESTAVA (HORIZONTAL)
-    setTimeout(() => {
-        wrapper.scrollLeft = wrapper.scrollWidth;
+            // Scroll do wrapper principal para o final
+            setTimeout(() => {
+                wrapper.scrollLeft = wrapper.scrollWidth;
+            }, 60);
 
-        // 🔥 ADICIONADO: SCROLL VERTICAL PARA O FINAL (PC + MOBILE)
-        if (stepsContainer) {
-            stepsContainer.scrollTop = stepsContainer.scrollHeight;
+            // Para cada step visível, garantir que seu conteúdo também seja visível
+            steps.forEach(step => {
+                if (step.style.display === 'none') return;
+
+                const content = step.querySelector('.step-content');
+                if (!content) return;
+
+                // Scroll horizontal do step individual se necessário
+                const stepRect = step.getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
+
+                if (stepRect.right > wrapperRect.right) {
+                    step.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
+                }
+            });
         }
 
-    }, 60);
-
-    // 🔵 MANTIDO EXATAMENTE COMO ESTAVA
-    steps.forEach(step => {
-        if (step.style.display === 'none') return;
-
-        const content = step.querySelector('.step-content');
-        if (!content) return;
-
-        const stepRect = step.getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
-
-        if (stepRect.right > wrapperRect.right) {
-            step.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
-        }
-    });
-}
 
 
         // ==================== BOTÕES VISUAIS DE NÍVEL ====================
