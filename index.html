@@ -4602,30 +4602,28 @@
             });
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
-        function scrollAllVisibleStepsToEnd(taskId) {
-    const taskElement = document
-        .querySelector(`[data-taskid="${taskId}"]`)
-        ?.closest('.task-item');
-
+function scrollAllVisibleStepsToEnd(taskId) {
+    const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
     if (!taskElement) return;
 
     const wrapper = taskElement.querySelector('.task-steps-wrapper');
     const stepsContainer = taskElement.querySelector('.task-steps'); // 🔥 container vertical
     const steps = taskElement.querySelectorAll('.task-step');
 
-    if (!wrapper || !stepsContainer) return;
+    if (!wrapper) return;
 
+    // 🔵 MANTIDO EXATAMENTE COMO ESTAVA (HORIZONTAL)
     setTimeout(() => {
-
-        // 🔥 SCROLL HORIZONTAL (igual ao seu original)
         wrapper.scrollLeft = wrapper.scrollWidth;
 
-        // 🔥 SCROLL VERTICAL PARA O FINAL
-        stepsContainer.scrollTop = stepsContainer.scrollHeight;
+        // 🔥 ADICIONADO: SCROLL VERTICAL PARA O FINAL (PC + MOBILE)
+        if (stepsContainer) {
+            stepsContainer.scrollTop = stepsContainer.scrollHeight;
+        }
 
     }, 60);
 
-    // Mantém sua lógica horizontal individual
+    // 🔵 MANTIDO EXATAMENTE COMO ESTAVA
     steps.forEach(step => {
         if (step.style.display === 'none') return;
 
@@ -4636,11 +4634,7 @@
         const wrapperRect = wrapper.getBoundingClientRect();
 
         if (stepRect.right > wrapperRect.right) {
-            step.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'end'
-            });
+            step.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
         }
     });
 }
