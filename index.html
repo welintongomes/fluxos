@@ -3237,33 +3237,45 @@
             const isCollapsed = icon.textContent === '▶';
 
             if (isCollapsed) {
-                // ===== OCULTAR IRMÃOS E TODOS OS SEUS DESCENDENTES =====
-                steps.forEach((step, idx) => {
-                    const stepLevel = parseInt(step.getAttribute('data-level'));
+    // ===== OCULTAR IRMÃOS E TODOS OS SEUS DESCENDENTES =====
+    steps.forEach((step, idx) => {
+        const stepLevel = parseInt(step.getAttribute('data-level'));
 
-                    // É irmão (mesmo nível, não é o clicado)
-                    if (stepLevel === clickedLevel && idx !== stepIndex) {
-                        // 🔴 OCULTAR O PRÓPRIO IRMÃO
-                        step.style.display = 'none';
-                        const stepIcon = step.querySelector('.collapse-icon');
-                        if (stepIcon) stepIcon.textContent = '▶';
+        if (stepLevel === clickedLevel && idx !== stepIndex) {
+            // 🔴 Ocultar o próprio irmão
+            step.style.display = 'none';
+            const stepIcon = step.querySelector('.collapse-icon');
+            if (stepIcon) stepIcon.textContent = '▶';
 
-                        // 🔴 OCULTAR TODOS OS DESCENDENTES DO IRMÃO
-                        for (let i = idx + 1; i < steps.length; i++) {
-                            const childLevel = parseInt(steps[i].getAttribute('data-level'));
-                            if (childLevel <= stepLevel) break;
-                            steps[i].style.display = 'none';
-                            const childIcon = steps[i].querySelector('.collapse-icon');
-                            if (childIcon) childIcon.textContent = '▶';
-                        }
-                    }
-                });
-                setTimeout(() => {
-                    clickedStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // pequeno delay para o DOM atualizar antes de rolar
-                    scrollAllVisibleStepsToEnd(taskId);
-                }, 60);
+            // 🔴 Ocultar todos os descendentes do irmão
+            for (let i = idx + 1; i < steps.length; i++) {
+                const childLevel = parseInt(steps[i].getAttribute('data-level'));
+                if (childLevel <= stepLevel) break;
+                steps[i].style.display = 'none';
+                const childIcon = steps[i].querySelector('.collapse-icon');
+                if (childIcon) childIcon.textContent = '▶';
             }
+        }
+    });
+
+    // ===== Espera layout atualizar =====
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            // Scroll vertical suave até o final do container
+            const stepsContainer = taskElement.querySelector('.task-steps');
+            if (stepsContainer) {
+                stepsContainer.scrollTo({
+                    top: stepsContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Scroll horizontal conforme sua função original
+            scrollAllVisibleStepsToEnd(taskId);
+        });
+    });
+}
+
 
             // Atualizar ícone do item clicado
             icon.textContent = isCollapsed ? '▼' : '▶';
@@ -4607,51 +4619,34 @@ function scrollAllVisibleStepsToEnd(taskId) {
     if (!taskElement) return;
 
     const wrapper = taskElement.querySelector('.task-steps-wrapper');
-    const stepsContainer = taskElement.querySelector('.task-steps'); // container vertical
     const steps = taskElement.querySelectorAll('.task-step');
 
     if (!wrapper) return;
 
-    // 🔹 Espera 2 frames para garantir que o layout finalizou
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+    // Scroll horizontal principal
+    setTimeout(() => {
+        wrapper.scrollLeft = wrapper.scrollWidth;
+    }, 60);
 
-            // 🔹 VERTICAL SUAVE
-            if (stepsContainer) {
-                stepsContainer.scrollTo({
-                    top: stepsContainer.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }
+    // Scroll horizontal individual de cada step
+    steps.forEach(step => {
+        if (step.style.display === 'none') return;
 
-            // 🔹 HORIZONTAL SUAVE (mantendo sua lógica original)
-            wrapper.scrollTo({
-                left: wrapper.scrollWidth,
-                behavior: 'smooth'
+        const content = step.querySelector('.step-content');
+        if (!content) return;
+
+        const stepRect = step.getBoundingClientRect();
+        const wrapperRect = wrapper.getBoundingClientRect();
+
+        if (stepRect.right > wrapperRect.right) {
+            step.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'end'
             });
-
-            // 🔹 Scroll individual de cada step horizontal, se necessário
-            steps.forEach(step => {
-                if (step.style.display === 'none') return;
-
-                const content = step.querySelector('.step-content');
-                if (!content) return;
-
-                const stepRect = step.getBoundingClientRect();
-                const wrapperRect = wrapper.getBoundingClientRect();
-
-                if (stepRect.right > wrapperRect.right) {
-                    step.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'nearest',
-                        inline: 'end'
-                    });
-                }
-            });
-        });
+        }
     });
 }
-
 
 
         // ==================== BOTÕES VISUAIS DE NÍVEL ====================
