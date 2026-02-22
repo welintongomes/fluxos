@@ -483,6 +483,8 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+                min-height: 65vh;          /* ← ADICIONA */
+    justify-content: center;   /* ← ADICIONA */
         }
 
         /* ── Task item ── */
@@ -677,17 +679,20 @@
         }
 
         /* SUBSTITUA o .task-steps atual por este: */
-.task-steps {
-    min-height: 153px;
-    max-height: 344px;
-    overflow-y: auto;
-    overflow-x: visible;  /* ← MUDA: era auto, agora deixa o wrapper controlar */
-    padding: 8px 16px 12px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-    width: max-content;      /* ← ADICIONA: expande conforme o step mais largo */
-    min-width: 100%;         /* ← ADICIONA: garante largura mínima do wrapper */
-}
+        .task-steps {
+            min-height: 153px;
+            max-height: 344px;
+            overflow-y: auto;
+            overflow-x: visible;
+            /* ← MUDA: era auto, agora deixa o wrapper controlar */
+            padding: 8px 16px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+            width: max-content;
+            /* ← ADICIONA: expande conforme o step mais largo */
+            min-width: 100%;
+            /* ← ADICIONA: garante largura mínima do wrapper */
+        }
 
         .task-steps::-webkit-scrollbar {
             width: 4px;
@@ -1413,6 +1418,16 @@
             color: #dc3545 !important;
             font-weight: 600;
         }
+        #taskList {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.task-list.has-search {
+    justify-content: flex-start;  /* resultados começam do centro */
+    padding-top: 20vh;
+}
 
         /* ── Mobile ── */
         @media (max-width: 768px) {
@@ -1466,17 +1481,20 @@
             }
 
             /* SUBSTITUA o .task-steps atual por este: */
-.task-steps {
-    min-height: 153px;
-    max-height: 344px;
-    overflow-y: auto;
-    overflow-x: visible;  /* ← MUDA: era auto, agora deixa o wrapper controlar */
-    padding: 8px 16px 12px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-    width: max-content;      /* ← ADICIONA: expande conforme o step mais largo */
-    min-width: 100%;         /* ← ADICIONA: garante largura mínima do wrapper */
-}
+            .task-steps {
+                min-height: 153px;
+                max-height: 344px;
+                overflow-y: auto;
+                overflow-x: visible;
+                /* ← MUDA: era auto, agora deixa o wrapper controlar */
+                padding: 8px 16px 12px;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+                width: max-content;
+                /* ← ADICIONA: expande conforme o step mais largo */
+                min-width: 100%;
+                /* ← ADICIONA: garante largura mínima do wrapper */
+            }
 
             .create-btn-row {
                 justify-content: space-between;
@@ -3267,14 +3285,14 @@
                     }
                 });
                 // SUBSTITUA o setTimeout problemático por:
-requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-        const taskStepsEl = clickedStep.closest('.task-steps');
-        if (taskStepsEl) taskStepsEl.scrollTop = taskStepsEl.scrollHeight;
-        const wrapperEl = clickedStep.closest('.task-steps-wrapper');
-        if (wrapperEl) wrapperEl.scrollLeft = wrapperEl.scrollWidth;
-    });
-});
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        const taskStepsEl = clickedStep.closest('.task-steps');
+                        if (taskStepsEl) taskStepsEl.scrollTop = taskStepsEl.scrollHeight;
+                        const wrapperEl = clickedStep.closest('.task-steps-wrapper');
+                        if (wrapperEl) wrapperEl.scrollLeft = wrapperEl.scrollWidth;
+                    });
+                });
             }
 
             // Atualizar ícone do item clicado
@@ -4614,24 +4632,24 @@ requestAnimationFrame(() => {
             });
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
-        
+
         function scrollAllVisibleStepsToEnd(taskId) {
-    const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
-    if (!taskElement) return;
+            const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
+            if (!taskElement) return;
 
-    const taskSteps = taskElement.querySelector('.task-steps');
-    const wrapper = taskElement.querySelector('.task-steps-wrapper');
-    if (!taskSteps || !wrapper) return;
+            const taskSteps = taskElement.querySelector('.task-steps');
+            const wrapper = taskElement.querySelector('.task-steps-wrapper');
+            if (!taskSteps || !wrapper) return;
 
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            // Vertical: mostra último item
-            taskSteps.scrollTop = taskSteps.scrollHeight;
-            // Horizontal: wrapper rola para o final do .task-steps (que agora tem largura real)
-            wrapper.scrollLeft = wrapper.scrollWidth;
-        });
-    });
-}
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    // Vertical: mostra último item
+                    taskSteps.scrollTop = taskSteps.scrollHeight;
+                    // Horizontal: wrapper rola para o final do .task-steps (que agora tem largura real)
+                    wrapper.scrollLeft = wrapper.scrollWidth;
+                });
+            });
+        }
 
         // ==================== BOTÕES VISUAIS DE NÍVEL ====================
 
@@ -4743,6 +4761,12 @@ requestAnimationFrame(() => {
                     currentPage = 1;
                     totalLoadedTasks = viewMode === 'compact' ? 2 : filteredTasks.length;
                     loadTasks();
+                    const taskList = document.getElementById('taskList');
+if (searchValue) {
+    taskList.classList.add('has-search');
+} else {
+    taskList.classList.remove('has-search');
+}
                 });
             }
 
@@ -4753,6 +4777,7 @@ requestAnimationFrame(() => {
                     currentPage = 1;
                     totalLoadedTasks = viewMode === 'compact' ? 2 : filteredTasks.length;
                     loadTasks();
+                    document.getElementById('taskList').classList.remove('has-search');
                 });
             }
 
