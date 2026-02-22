@@ -676,14 +676,18 @@
             border-radius: 3px;
         }
 
-        .task-steps {
-            min-height: 153px;
-            max-height: 344px;
-            overflow-y: auto;
-            padding: 8px 16px 12px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-        }
+        /* SUBSTITUA o .task-steps atual por este: */
+.task-steps {
+    min-height: 153px;
+    max-height: 344px;
+    overflow-y: auto;
+    overflow-x: visible;  /* ← MUDA: era auto, agora deixa o wrapper controlar */
+    padding: 8px 16px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+    width: max-content;      /* ← ADICIONA: expande conforme o step mais largo */
+    min-width: 100%;         /* ← ADICIONA: garante largura mínima do wrapper */
+}
 
         .task-steps::-webkit-scrollbar {
             width: 4px;
@@ -1461,14 +1465,18 @@
                 flex-direction: row;
             }
 
-            .task-steps {
-                min-height: 250px;
-                max-height: 344px;
-                overflow-y: auto;
-                padding: 8px 16px 12px;
-                scrollbar-width: thin;
-                scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-            }
+            /* SUBSTITUA o .task-steps atual por este: */
+.task-steps {
+    min-height: 153px;
+    max-height: 344px;
+    overflow-y: auto;
+    overflow-x: visible;  /* ← MUDA: era auto, agora deixa o wrapper controlar */
+    padding: 8px 16px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+    width: max-content;      /* ← ADICIONA: expande conforme o step mais largo */
+    min-width: 100%;         /* ← ADICIONA: garante largura mínima do wrapper */
+}
 
             .create-btn-row {
                 justify-content: space-between;
@@ -3258,11 +3266,15 @@
                         }
                     }
                 });
-                setTimeout(() => {
-                    clickedStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // pequeno delay para o DOM atualizar antes de rolar
-                    scrollAllVisibleStepsToEnd(taskId);
-                }, 60);
+                // SUBSTITUA o setTimeout problemático por:
+requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+        const taskStepsEl = clickedStep.closest('.task-steps');
+        if (taskStepsEl) taskStepsEl.scrollTop = taskStepsEl.scrollHeight;
+        const wrapperEl = clickedStep.closest('.task-steps-wrapper');
+        if (wrapperEl) wrapperEl.scrollLeft = wrapperEl.scrollWidth;
+    });
+});
             }
 
             // Atualizar ícone do item clicado
@@ -4602,37 +4614,25 @@
             });
         }
         // ==================== SCROLL HORIZONTAL PARA TODOS OS STEPS VISÍVEIS ====================
-function scrollAllVisibleStepsToEnd(taskId) {
-    const taskElement = document
-        .querySelector(`[data-taskid="${taskId}"]`)
-        ?.closest('.task-item');
-
+        
+        function scrollAllVisibleStepsToEnd(taskId) {
+    const taskElement = document.querySelector(`[data-taskid="${taskId}"]`).closest('.task-item');
     if (!taskElement) return;
 
+    const taskSteps = taskElement.querySelector('.task-steps');
     const wrapper = taskElement.querySelector('.task-steps-wrapper');
-    const stepsContainer = taskElement.querySelector('.task-steps');
+    if (!taskSteps || !wrapper) return;
 
-    if (!wrapper || !stepsContainer) return;
-
-    // Pequeno delay para garantir que o DOM já expandiu
-    setTimeout(() => {
-
-        // ✅ HORIZONTAL (correto para desktop e mobile)
-        wrapper.scrollTo({
-            left: wrapper.scrollWidth - wrapper.clientWidth,
-            behavior: 'smooth'
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            // Vertical: mostra último item
+            taskSteps.scrollTop = taskSteps.scrollHeight;
+            // Horizontal: wrapper rola para o final do .task-steps (que agora tem largura real)
+            wrapper.scrollLeft = wrapper.scrollWidth;
         });
-
-        // ✅ VERTICAL (até o final real)
-        stepsContainer.scrollTo({
-            top: stepsContainer.scrollHeight - stepsContainer.clientHeight,
-            behavior: 'smooth'
-        });
-
-    }, 80);
+    });
 }
 
-        
         // ==================== BOTÕES VISUAIS DE NÍVEL ====================
 
         function _getLineRange(textarea) {
